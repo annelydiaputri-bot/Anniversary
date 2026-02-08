@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy 2nd Anniversary</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f8f5f6;
+  --pink:#f7d6e0;
+  --ink:#2a2a2a;
+  --soft:#e8dfe3;
+  --card:#ffffff;
+}
+*{box-sizing:border-box;}
+body{margin:0; min-height:100vh; background:linear-gradient(180deg,var(--pink),var(--bg)); color:var(--ink); font-family:Inter,sans-serif; display:flex; align-items:center; justify-content:center; padding:12px;}
+.wrap{width:100%; max-width:420px;}
+.center{text-align:center;}
+h1{font-family:'Playfair Display', serif; color:#c77fa6; margin:10px 0 4px;}
+.date{opacity:.7; margin-bottom:18px;}
+.hero{background:radial-gradient(120% 80% at 50% -20%, var(--pink) 0%, #fff 45%, var(--bg) 100%); border-radius:24px; padding:28px 18px 22px; box-shadow:0 20px 40px rgba(0,0,0,.08);}
+.icon-btn{width:68px;height:68px;border-radius:50%;border:1px solid var(--soft);display:grid;place-items:center;margin:14px auto 6px;cursor:pointer;background:linear-gradient(180deg,#fff,var(--pink));}
+.heart{font-size:28px;}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:14px;}
+.tile{background:var(--card);border:1px solid var(--soft);border-radius:18px;padding:16px 12px;cursor:pointer;box-shadow:0 10px 18px rgba(0,0,0,.06);transition:transform .15s;}
+.tile:active{transform:scale(.97);}
+.tile h3{font-family:'Playfair Display',serif;font-size:16px;margin:6px 0 2px;}
+.tile p{font-size:12px;opacity:.7;}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;padding:12px;z-index:99;}
+.modal{background:var(--card);width:100%;max-width:420px;border-radius:22px;padding:18px 16px 16px;max-height:90vh;overflow:auto;position:relative;}
+.modal header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.close{border:none;background:transparent;font-size:28px;cursor:pointer;}
+.content{line-height:1.7;font-size:14px;}
+.gallery{display:flex;overflow-x:auto;gap:8px;padding:8px 0;}
+.gallery img{height:110px;border-radius:10px;cursor:pointer;flex-shrink:0;transition:transform .2s;}
+.gallery img:hover{transform:scale(1.05);}
+.zoom-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:100;}
+.zoom-overlay img{max-width:95%;max-height:95%;border-radius:12px;}
+.music{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px;}
+.play{border-radius:999px;padding:8px 14px;border:1px solid var(--soft);background:#fff;cursor:pointer;}
+footer{opacity:.6;font-size:12px;margin-top:10px;text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero center">
+    <h1>Happy 2nd Anniversary Abang Sayang</h1>
+    <div class="date">20 Februari 2026</div>
+    <div class="icon-btn" id="enter"><span class="heart">❤</span></div>
+
+    <!-- Player MP3 -->
+    <div class="music">
+      <button class="play" id="playBtn">▶ Play Music</button>
+      <small>LANY — Last Forever</small>
+    </div>
+    <audio id="bgm" src="lany-last-forever.mp3" loop></audio>
+  </div>
+
+  <div class="grid" id="menu" style="display:none;">
+    <div class="tile" data-open="love"><h3>Love You</h3><p>Ucapan dari adek</p></div>
+    <div class="tile" data-open="thank"><h3>Thank You</h3><p>Hal yang adek suka & syukuri</p></div>
+    <div class="tile" data-open="memory"><h3>Memory</h3><p>Momen seru kita di tahun ke-2</p></div>
+    <div class="tile" data-open="wishes"><h3>Wishes</h3><p>Harapan Adek untuk kita</p></div>
+  </div>
+
+  <footer>Made with love ❤</footer>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <header><h2 id="modalTitle"></h2><button class="close" id="close">×</button></header>
+    <div class="content" id="modalContent"></div>
+  </div>
+</div>
+
+<div class="zoom-overlay" id="zoomOverlay"><img id="zoomImg" src=""></div>
+
+<script>
+const enter = document.getElementById('enter');
+const menu = document.getElementById('menu');
+const overlay = document.getElementById('overlay');
+const modalTitle = document.getElementById('modalTitle');
+const modalContent = document.getElementById('modalContent');
+const closeBtn = document.getElementById('close');
+const zoomOverlay = document.getElementById('zoomOverlay');
+const zoomImg = document.getElementById('zoomImg');
+
+const playBtn = document.getElementById('playBtn');
+const bgm = document.getElementById('bgm');
+
+enter.onclick = ()=> menu.style.display='grid';
+closeBtn.onclick = ()=> overlay.style.display='none';
+overlay.onclick = e=>{if(e.target===overlay) overlay.style.display='none';};
+
+playBtn.onclick = ()=>{
+  if(bgm.paused){
+    bgm.play();
+    playBtn.textContent='⏸ Pause Music';
+  } else {
+    bgm.pause();
+    playBtn.textContent='▶ Play Music';
+  }
+};
+
+document.querySelectorAll('.tile').forEach(t=>t.onclick=()=>openModal(t.dataset.open));
+
+
+function openModal(key){
+  overlay.style.display='flex';
+  if(key==='love'){
+    modalTitle.textContent='Happy Anniversary Abang Sayangku';
+    modalContent.innerHTML=`<p>Terima kasih sayangku sudah bersama di 2 tahun ini dalam hari-hari yang ringan sampai yang berat, dalam tawa yang lepas sampai diam yang panjang. Bareng Abang, Adek belajar tentang sabar, tentang mengerti, dan tentang cara mencintai dengan tenang. Abang bukan cuma pasangan buat adek, tapi juga rumah. Tempat adek pulang pas dunia lagi ribut, tempat adek manja, cerita, dan ngeluh tanpa takut dijudge. Kalau sama Abang, adek bisa jadi diri adek sendiri, yang cerewet, manja, sensitif, dan kadang kekanak-kanakan. Terima kasih karena selalu ada, walaupun kadang adek nggak selalu mudah dimengerti. Terima kasih karena tetap peluk adek walaupun adek lagi nyebelin. Terima kasih karena setiap hari tetap milih adek tanpa ragu. Adek sayang Abang, lebih dari yang bisa adek jelasin dengan kata kata.<br><br>Your Love,<br>Adek sayangnya Abang🖤</p>`;
+  }
+  if(key==='thank'){
+    modalTitle.textContent='Aku Menyukai Perjalanan Hidupku yang Ada Kamu di Dalamnya';
+    modalContent.innerHTML=`<p>
+1. Aku suka caramu memperlakukanku dengan lembut<br>
+2. Aku bersyukur kamu selalu menghargai perasaanku<br>
+3. Aku suka caramu menenangkanku tanpa menyalahan<br>
+4. Aku bersyukur kamu tetap sabar saat aku sedang sulit dimengerti<br>
+5. Aku suka caramu tetap tenang walaupun sedang kesal<br>
+6. Aku bersyukur kamu memberi ruang tanpa menjauh<br>
+7. Aku suka caramu mempercayaiku<br>
+8. Aku suka caramu melindungiku tanpa mengatur hidupku<br>
+9. Aku bersyukur kamu tidak pernah mencurigaiku tanpa alasan<br>
+10. Aku suka caramu jujur meski tidak selalu mudah<br>
+11. Aku suka caramu tahu kapan aku butuh dipeluk<br>
+12. Aku bersyukur kamu mau mengerti sebelum membela diri<br>
+13. Aku suka caramu bertanggung jawab atas kesalahanmu<br>
+14. Aku suka caramu bertanya, bukan menuduh<br>
+15. Aku suka caramu menyelesaikan masalah, bukan menghindari<br>
+16. Aku suka caramu bikin aku merasa aman bicara apapun<br>
+17. Aku bersyukur kamu ga menghakimi perasaanku<br>
+18. Aku bersyukur kamu memilih bertahan dan memperbaiki<br>
+19. Aku suka caramu menghargai usahaku, sekecil apapun itu<br>
+20. Aku sangat suka caramu menjaga batasan dengan orang lain<br>
+21. Aku bersyukur kamu setia dalam sikap dan tindakan<br>
+22. Aku suka caramu menguatkanku saat aku ragu<br>
+23. Aku suka caramu bangga padaku<br>
+24. Aku suka caramu konsisten memperlakukanku dengan baik<br>
+25. Aku suka caramu menepati janji<br>
+26. Aku bersyukur kamu sangat bisa diandalkan<br>
+27. Aku suka caramu hadir saat aku butuh<br>
+28. Aku suka caramu mengusahakan aku<br>
+29. Aku suka caramu menghormati pendapatku<br>
+30. Aku suka caramu membelaku dengan cara yang dewasa<br>
+31. Aku suka caramu menjaga perasaanku di hadapan orang lain<br>
+32. Aku bersyukur aku merasa aman mencintaimu<br>
+33. Aku suka caramu memberi kabar<br>
+34. Aku suka caramu jujur tentang perasaanmu<br>
+35. Aku suka caramu melibatkan aku dalam keputusanmu<br>
+36. Aku bersyukur kamu mengajakku menjadi bagian dari duniamu<br>
+37. Aku bersyukur kamu memperlakukanku sebagai tujuan<br>
+38. Aku suka caramu mengingat hal hal kecil tentang aku<br>
+39. Aku suka caramu selalu ngecek keadaanku sebelum tidur<br>
+40. Aku suka caramu yang memastikan kabarku saat aku tidak baik-baik saja<br>
+41. Aku bersyukur kamu selalu bikin aku merasa ditemenin walau jarak kita jauh<br>
+42. Aku bersyukur kamu tahu caranya bikin aku tenang tanpa banyak kata<br>
+43. Aku bersyukur kamu peduli ke perasaanku, bukan cuma ke keadaanku<br>
+44. Aku bersyukur kamu nggak pernah bikin aku merasa sendirian<br>
+45. Aku suka karena kamu bikin jarak nggak terasa jauh<br>
+46. Aku suka karena kamu nggak pernah lelah dengerin keluhku<br>
+47. Aku suka caramu nyanyiin aku walau suaramu pelan karena udah larut malam<br>
+48. Aku suka kamu selalu jemput dan antar aku sampai benar-benar masuk rumah<br>
+49. Aku suka caramu ngendarain motor sambil ngecek aku lewat kaca spion<br>
+50. Aku suka caramu nyesuain AC biar aku nyaman<br>
+51. Aku bersyukur kamu biarin aku tidur dan mastiin posisi tidurku nyaman saat kita di perjalanan<br>
+52. Aku suka caramu tetap fokus nyetir meski aku terlelap<br>
+53. Aku suka caramu nyariin tempat makan buat aku<br>
+54. Aku bersyukur kamu senang lihat aku makan dengan lahap<br>
+55. Aku suka caramu beliin aku es krim pas aku ga baik baik aja<br>
+56. Aku suka caramu diem-diem nyiapin kejutan kecil<br>
+57. Aku suka caramu bikin hari burukku jadi lebih ringan<br>
+58. Aku bersyukur kamu ngajak aku jalan ke tempat yang tenang dan indah<br>
+59. Aku suka caramu muji aku tanpa berlebihan tapi tulus<br>
+60. Aku suka caramu bilang aku cantik di hari-hari biasa<br>
+61. Aku bersyukur kamu lihat aku sebagai cukup<br>
+62. Aku bersyukur kamu nggak ninggalin aku saat aku lagi sensitif<br>
+63. Aku suka caramu ngasih bunga ke aku seolah bilang, “aku kepikiran kamu.”<br>
+64. Aku bersyukur kamu inget kalau aku suka hal-hal kecil yang romantis.<br>
+65. Aku suka caramu selalu nyari jalan keluar pas aku lagi bingung<br>
+66. Aku bersyukur kamu nggak ninggalin aku sendirian sama pikiranku<br>
+67. Aku suka caramu ngerekomendasiin makanan yang pas sama mood aku<br>
+68. Aku bersyukur kamu selalu beliin aku makanan enak kalau aku sama aku<br>
+69. Aku suka caramu mastiin aku kenyang sebelum mikirin dirimu sendiri<br>
+70. Aku suka caramu nurutin tempat tempat yang aku mau kunjungi<br>
+71. Aku suka caramu bilang, “Ayo kita coba sayang”<br>
+72. Aku suka caramu mengelus kepalaku waktu aku ketiduran di mobil.<br>
+73. Aku bersyukur kamu jaga aku tetap nyaman kalau kita lagi di perjalanan<br>
+74. Aku suka caramu tetap nyetir pelan supaya aku nggak kebangun<br>
+75. Aku bersyukur kamu memperlakukanku seperti sesuatu yang harus dijaga<br>
+76. Aku suka saat kita lagi jalan dan kamu tiba-tiba bilang, “makan apa adek mau?”<br>
+77. Aku bersyukur kamu nggak pernah pelit buat bahagiain aku<br>
+78. Aku suka karena kamu ngajarin aku dengan sabar untuk hal hal yang aku ga tau<br>
+79. Aku suka saat kamu ngajak aku ke tempat yang belum pernah aku datangi<br>
+80. Aku bersyukur kamu bikin hidupku jadi sangat berwarna<br>
+81. Aku suka caramu bikin hal baru jadi terasa aman buat dicoba<br>
+82. Aku suka saat kita ngobrol lama sampai lupa waktu<br>
+83. Aku suka caramu nyambung diajak diskusi apa pun<br>
+84. Aku bersyukur kamu jawab semua pertanyaanku dengan niat, bukan asal lewat<br>
+85. Aku bersyukur kamu menjadikan “selamat tidur” bukan sekedar kata, tapi kehadiran<br>
+86. Aku bersyukur kamu nggak cuma hadir hari ini, tapi juga memikirkan hari esok bersamaku<br>
+87. Aku suka caramu berjuang diam-diam demi kita<br>
+88. Aku suka caramu nggak maksa aku cerita tapi tetap ada<br>
+89. Aku suka karena kamu kirim foto aktivitasmu biar aku tahu harimu<br>
+90. Aku suka karena kamu nyempetin video call di sela kesibukanmu<br>
+91. Aku suka karena kamu ngomong pelan-pelan waktu aku lagi overthinking<br>
+92. Aku suka karena kamu mikir dulu sebelum ambil keputusan soal kita<br>
+93. Aku bersyukur karena kamu ngorbanin waktu istirahat biar bisa tetap ada buat aku<br>
+94. Aku bersyukur kamu mikirin jadwalmu biar bisa ketemu aku<br>
+95. Aku bersyukur kamu selalu nyiapin sesuatu sebelum ketemu aku<br>
+96. Aku suka karena kamu memperlakukan aku dengan penuh tanggung jawab<br>
+97. Aku suka karena wajah kita berdua yang kamu lihat setiap kali kamu buka ponsel<br>
+98. Aku suka karena kamu memakai namaku sebagai password akunmu<br>
+99. Aku suka karena kamu menggunakan namaku sebagai ID di akun gamemu
+</p>`;
+  }
+
+     if(key==='memory'){
+    modalTitle.textContent='Memory';
+    let html='';
+    for(let i=1;i<=20;i++){
+      html+=`<img src="foto${i}.jpeg" alt="Memory ${i}" onclick="zoomPhoto(this)"> `;
+    }
+    modalContent.innerHTML=`<div class="gallery">${html}</div>`;
+  }
+
+  if(key==='wishes'){
+    modalTitle.textContent='Semoga yang Selalu Disemogakan';
+    modalContent.innerHTML=`<p>Semoga kita tetap saling milih setiap hari, bahkan di hari-hari yang capek dan nggak manis buat kita. Semoga kita tetap ngobrol dari hal receh sampai hal paling serius, tanpa takut jadi diri sendiri. Semoga Abang selalu jadi tempat adek pulang, dan adek juga jadi tempat Abang bersandar. Semoga kita terus tumbuh bareng, bukan cuma bareng-bareng, tapi saling nguatin. Semoga kita tetap ketawa bareng, meskipun dunia lagi ribut sama kita. Semoga kita saling jaga hati, saling ngerti tanpa harus selalu dijelasin. Semoga cinta kita nggak cuma terasa, tapi juga kelihatan dari cara kita memperlakukan satu sama lain. Dan semoga suatu hari nanti, semua cerita jadi kenangan yang kita banggakan bersama. I love you more than you realize sayangku cintaku honey bunny sweetyku.</p>`;
+  }
+}
+function zoomPhoto(img){
+  zoomImg.src = img.src;
+  zoomOverlay.style.display='flex';
+}
+zoomOverlay.onclick = ()=> zoomOverlay.style.display='none';
+</script>
+</body>
+</html>
